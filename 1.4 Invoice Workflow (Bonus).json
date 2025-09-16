@@ -1,0 +1,851 @@
+{
+  "name": "1.4 Invoice Workflow (Bonus)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## What do the invoice look like ? \n\n1. PDF Invoice -- Extract Text from PDF -- Code node to extract infromation we need each per parameter\n\n2. Scanned Invoice -- Not able to extract Text from it -- Use OCR element\n\n \n",
+        "height": 208,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        0
+      ],
+      "id": "e5561e91-8ed0-47e7-821e-580b0485c8a5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Requirements\n\n**1. We want to extract the same x fields, but the formats may not be consistent, we will use an AI information extractor. \n\n2. The Invoice will be updated to our Google sheets 9Invoice DB) \n\n3. An email can be sent to the internal billing team**\n\n \n\n",
+        "height": 224,
+        "width": 448,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        256,
+        544
+      ],
+      "id": "75fa7e87-219b-45f5-9299-f9cc75235349",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Invoice No",
+              "description": "The Number of the Invoice",
+              "required": true
+            },
+            {
+              "name": "Client Name",
+              "description": "The Name of The client",
+              "required": true
+            },
+            {
+              "name": "Client Email",
+              "description": "The Email of the Clien, Make sure the client email should have @ in the email if its not then output reuslt as Not Available",
+              "required": true
+            },
+            {
+              "name": "Client Address",
+              "description": "The Address of the Clinet",
+              "required": true
+            },
+            {
+              "name": "Client Phone",
+              "description": "The Phone number or Contact number of the Clinet",
+              "required": true
+            },
+            {
+              "name": "Total Amount",
+              "description": "The Total Amount of the Invoice",
+              "required": true
+            },
+            {
+              "name": "Invoice Date",
+              "description": "The date the invoice sent ",
+              "required": true
+            },
+            {
+              "name": "Due Date",
+              "description": "the date the invoice is due",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        224
+      ],
+      "id": "aeb9ed11-9c7d-42ee-b81e-4a02b4b7bbf0",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Invoice Number: {{ $json['Invoice No'] }}\nClinet Name: {{ $json['Client Name'] }}\nClient Email: {{ $json['Client Email'] }}\nTotal Amount: {{ $json['Total Amount'] }}\nInvoice Date: {{ $json['Invoice Date'] }}\nDue Date: {{ $json['Due Date'] }}",
+              "role": "=user"
+            },
+            {
+              "content": "=## Overview\nYou are an email expert for Green Grass Corp name Greenland. You will recive invoice infromation. Your job is to notify the internal billing team that an invoice was recived/sent.\n\n## Email \nInform the billing team of the invoice. Let them know that we have also updated this in the Invoice Database ,and they can view it here:\nhttps://docs.google.com/spreadsheets/d/1HPR7hr4LysBYJ1o_LSrD4i_6yepojkGZzMch-pIoxXo/edit?gid=0#gid=0\n\n## Output\nOutput the following parameters seperatley \nSubject \nEmail",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1456,
+        224
+      ],
+      "id": "241478f0-8964-4931-b856-ec3e52f09dff",
+      "name": "Create Email",
+      "credentials": {
+        "openAiApi": {
+          "id": "2ll7nWhcZokpqeYF",
+          "name": "OpenAi account AIS"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        224
+      ],
+      "id": "9966025b-9bbb-4fd8-a2eb-b364ac0f616e",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "content": "## New Invoice \n\n- What do the invoices look like?\n- Where do they go?\nWhat actions will we take?\nWhat will be the incoming invoice frequency?",
+        "height": 176,
+        "width": 464,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "5a18bf23-2ac8-4e45-b432-0069c6397a8a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Send Email Node\n**Send to: billing@example.com**\n\n\n",
+        "height": 80,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        96
+      ],
+      "id": "d9ec78b8-4b49-404b-aed7-faee107a3e16",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Craft Email\n**1. Some of the extracted fields\n2. Email Template**\n\n\n",
+        "height": 96,
+        "width": 272,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        80
+      ],
+      "id": "a48cd886-1426-43ad-8ecc-34c67ed9bab9",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Update Invoice DB\n\n**8 items : 8 fields extracted need to update**\n\n\n\n",
+        "width": 198,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        16
+      ],
+      "id": "a5114564-9b64-482e-a81e-be13a514ca8f",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## AI Node : Info Extractor\n\n**8 fields to extract from PDF**\n\n\n\n",
+        "width": 198,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        16
+      ],
+      "id": "ad80660e-c464-41e3-9b55-5caaa07499d9",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1ZdQ88dvjHA9IBArz9QOiH8eKQ-LddaZi",
+          "mode": "list",
+          "cachedResultName": "INVOICE AIS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1ZdQ88dvjHA9IBArz9QOiH8eKQ-LddaZi"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        272,
+        224
+      ],
+      "id": "9a0cb8d4-b0ab-4709-82c2-2bdd122e1c38",
+      "name": "Google Drive Trigger : When new Invoive pdf uploaded",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "4WOHyJQrlP95eZp9",
+          "name": "Google Drive account AIS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {}
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        528,
+        224
+      ],
+      "id": "9f1e4975-fadc-4e5c-905f-d120ceee9a1f",
+      "name": "Download : Binary File",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "4WOHyJQrlP95eZp9",
+          "name": "Google Drive account AIS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Download : Binary File\n**File : By ID : beacuse we want to be dynamic : Not from list**",
+        "height": 128
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        464,
+        384
+      ],
+      "id": "cf60cb26-4e5f-427c-8b30-6a8707ef0cb2",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        768,
+        224
+      ],
+      "id": "fbcea04e-15c9-4fb8-9d56-5287f2e9382e",
+      "name": "Extract Text from Binary File : PDF"
+    },
+    {
+      "parameters": {
+        "content": "## Information Extractor \n**Schema Typ: \nFrom Attribute Descriptions\nAttributes**\n\n**ATTRIBUTES**\n1. Invoice No\n2. Client Name\n3. Client Email\n4. Client Address\n5. Client Phone\n6. Total Amount\n7. Invoice Date\n8. Due Date",
+        "height": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        416
+      ],
+      "id": "1481726f-a551-42f0-bab0-faf7284626f0",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        960,
+        368
+      ],
+      "id": "f0d47200-22a0-4157-9069-21ccbbb451b9",
+      "name": "gemini-2.0-flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "nhAOL9sKMfyG8Vrt",
+          "name": "Google Gemini(PaLM) API account AIS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HPR7hr4LysBYJ1o_LSrD4i_6yepojkGZzMch-pIoxXo",
+          "mode": "list",
+          "cachedResultName": "1.4 Invoice Update DB AIS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HPR7hr4LysBYJ1o_LSrD4i_6yepojkGZzMch-pIoxXo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HPR7hr4LysBYJ1o_LSrD4i_6yepojkGZzMch-pIoxXo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice No": "={{ $json.output['Invoice No'] }}",
+            "Client Name": "={{ $json.output['Client Name'] }}",
+            "Client Email": "={{ $json.output['Client Email'] }}",
+            "Client Address": "={{ $json.output['Client Address'] }}",
+            "Client Phone": "={{ $json.output['Client Phone'] }}",
+            "Total Amount": "={{ $json.output['Total Amount'] }}",
+            "Invoice Date": "={{ $json.output['Invoice Date'] }}",
+            "Due Date": "={{ $json.output['Due Date'] }}"
+          },
+          "matchingColumns": [
+            "Invoice No"
+          ],
+          "schema": [
+            {
+              "id": "Invoice No",
+              "displayName": "Invoice No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client Email",
+              "displayName": "Client Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client Address",
+              "displayName": "Client Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client Phone",
+              "displayName": "Client Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Invoice Date",
+              "displayName": "Invoice Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        224
+      ],
+      "id": "993a93da-5840-48da-bdf5-400c14fb20a1",
+      "name": "Update Invoice DB (Append)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "r5dJyl6N7Nvh7Os3",
+          "name": "Google Sheets AIS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## System Message\n**Add URL in Email : Update Invoice DB (Append)**\n\nhttps://docs.google.com/spreadsheets/d/1HPR7hr4LysBYJ1o_LSrD4i_6yepojkGZzMch-pIoxXo/edit?gid=0#gid=0",
+        "height": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        432
+      ],
+      "id": "7ed27889-53d7-401a-ac1f-97a8d6fd1d32",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "sendTo": "sachinsavkare08@outlook.com",
+        "subject": "={{ $json.message.content.Subject }}",
+        "emailType": "text",
+        "message": "={{ $json.message.content.Email }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1808,
+        224
+      ],
+      "id": "6f49f162-3609-4781-9b21-681d43577cfe",
+      "name": "Send Email to Billing Team",
+      "webhookId": "60f2eecd-fb11-4e22-b9f6-3631e58914f0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eCK4EFn7FCxilJEq",
+          "name": "Gmail AIS"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Google Drive Trigger : When new Invoive pdf uploaded": [
+      {
+        "json": {
+          "parents": [
+            "1ZdQ88dvjHA9IBArz9QOiH8eKQ-LddaZi"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Sachin Savkare",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "05349959108883500575",
+            "emailAddress": "sachinsavkare08@gmail.com",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLeNcXoqtn_puBCiKLRKXIzG2oXS7fROtgDVgExp3Qhd3-pkz81ow=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Sachin Savkare",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "05349959108883500575",
+              "emailAddress": "sachinsavkare08@gmail.com",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLeNcXoqtn_puBCiKLRKXIzG2oXS7fROtgDVgExp3Qhd3-pkz81ow=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "05349959108883500575",
+              "type": "user",
+              "emailAddress": "sachinsavkare08@gmail.com",
+              "role": "owner",
+              "displayName": "Sachin Savkare",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLeNcXoqtn_puBCiKLRKXIzG2oXS7fROtgDVgExp3Qhd3-pkz81ow=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "05349959108883500575"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1VnChJFkKIQsM9Xz7RVmv_WtHGUICl_TI",
+          "name": "invoice-0-4.pdf",
+          "mimeType": "application/pdf",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "9",
+          "webContentLink": "https://drive.google.com/uc?id=1VnChJFkKIQsM9Xz7RVmv_WtHGUICl_TI&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1VnChJFkKIQsM9Xz7RVmv_WtHGUICl_TI/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+          "hasThumbnail": true,
+          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBNB0TWepFG-tsxSErh5h5lrBh_mGpqRdsLoHzUpE-nAeVg7NBG5qZ4t88ia0kN8a2pUSCv8q--N297TGFpjA79r4_I7uE6G2W-9CpKnEd1KI-g=s220",
+          "thumbnailVersion": "1",
+          "viewedByMe": true,
+          "viewedByMeTime": "2025-09-12T17:21:15.354Z",
+          "createdTime": "2025-07-17T11:45:36.455Z",
+          "modifiedTime": "2025-07-14T13:34:00.000Z",
+          "modifiedByMeTime": "2025-07-14T13:34:00.000Z",
+          "modifiedByMe": true,
+          "shared": false,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "invoice-0-4.pdf",
+          "fullFileExtension": "pdf",
+          "fileExtension": "pdf",
+          "md5Checksum": "26d332703a02aca0c96bcff8f0bc86b6",
+          "sha1Checksum": "3d3377b074aac12f3c7003315ca8fddb90376edf",
+          "sha256Checksum": "69cbdcd6380592c6b1ce19b5422119f1cf9ac4722edafa20fe11d642fb63d346",
+          "size": "67737",
+          "quotaBytesUsed": "67737",
+          "headRevisionId": "0B9BrzjuyomD1eHQ3Q1VXWVpQTEhjOHlzeUNsU0p2Mk03aWF3PQ",
+          "isAppAuthorized": false,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ],
+    "Extract Text from Binary File : PDF": [
+      {
+        "json": {
+          "numpages": 2,
+          "numrender": 2,
+          "info": {
+            "PDFFormatVersion": "1.7",
+            "Language": "en-US",
+            "EncryptFilterName": null,
+            "IsLinearized": false,
+            "IsAcroFormPresent": false,
+            "IsXFAPresent": false,
+            "IsCollectionPresent": false,
+            "IsSignaturesPresent": false,
+            "Author": "Nicolae Cocan",
+            "Creator": "Microsoft® Word for Microsoft 365",
+            "CreationDate": "D:20220207154444+02'00'",
+            "ModDate": "D:20220207154444+02'00'",
+            "Producer": "Microsoft® Word for Microsoft 365"
+          },
+          "metadata": {
+            "pdf:producer": "Microsoft® Word for Microsoft 365",
+            "dc:creator": [
+              "Nicolae Cocan"
+            ],
+            "xmp:creatortool": "Microsoft® Word for Microsoft 365",
+            "xmp:createdate": "2022-02-07T15:44:44+02:00",
+            "xmp:modifydate": "2022-02-07T15:44:44+02:00",
+            "xmpmm:documentid": "uuid:D09DC0B6-269C-475C-89B0-B37A0AD85CC9",
+            "xmpmm:instanceid": "uuid:D09DC0B6-269C-475C-89B0-B37A0AD85CC9"
+          },
+          "text": "Bioplex\nwe love chemistry\n5 Rue Bader\nNarbonne, Aude, 11100\nPhone: +33 140 260294\nINVOICE\nINVOICE # BPXINV-00550\nDATE: 23.05.2021\nTO:\nRoger Bigot\nbonbono\n4 Rue des Cites\nAubervilliers, Seine-Saint-Denis, 93300\nPhone: +33 148 340990\nSHIP TO:\nRoger Bigot\nbonbono\n4 Rue des Cites\nAubervilliers, Seine-Saint-Denis, 93300\nPhone: +33 148 340990\nCOMMENTS OR SPECIAL INSTRUCTIONS:\nNone\nSALESPERSON P.O. NUMBER TERMS\nMarianne de la Guillaume BPXPO-00536 Due after 30 days\nQUANTITY DESCRIPTION \nUNIT PRICE TOTAL\n10 \nDextromethorphan polistirex\nBPXPN-00057\n12.45 124.50\n25 \nVenlafaxine Hydrochloride\nBPXPN-00012\n16.00 400.00\n25 \nMetoclopramide Hydrochloride (BPXPO-00537)\nBPXPN-00002\n9.99 249.75\n10 \nAvobenzone, octinoxate (BPXPO-00538)\nBPXPN-00027\n4.45 44.50\n10 \nVerapamil hydrochloride\nBPXPN-00066\n7.89 78.90\n15 \nTiagabine hydrochloride\nBPXPN-00017\n10.25 153.75\n10 \nZiprasidone hydrochloride (BPXPO-00537)\nBPXPN-00044\n34.99 349.90\n10 \nRisperidone\nBPXPN-00023\n34.99 349.90\n10 \nMetoprolol succinate\nBPXPN-00067\n34.99 349.90\n10 \nAcetaminophen\nBPXPN-00045\n34.99 349.90\n15 \nSorafenib\nBPXPN-00018\n16.00 240.00\n15 \nTelmisartan\nBPXPN-00022\n9.99 149.85\n15 \nFamotidine\nBPXPN-00068\n4.45 66.75\n15 \nMethylphenidate Hydrochloride\nBPXPN-00005\n7.89 118.35\n100 Ibuprofen (BPXPO-00538) 0.99 99.00\n\n2\nBPXPN-00052\n15 \nMetformin Hydrochloride (BPXPO-00538)\nBPXPN-00046\n2.15 32.25\n15 \nAvobenzone, Octisalate and Octocrylene\nBPXPN-00069\n16.99 254.85\n10 \nCarisoprodol\nBPXPN-00070\n34.99 349.90\n10 \nLosartan Potassium\nBPXPN-00047\n34.99 349.90\n10 \nPentazocine Hydrochloride and Naloxone Hydrochloride\nBPXPN-00051\n34.99 349.90\n25 \nOmeprazole\nBPXPN-00071\n9.99 249.75\n25 \nLosartan Potassium\nBPXPN-00019\n4.45 111.25\n10 \nSaline\nBPXPN-00048\n7.89 78.90\n25 \nTitanium dioxide\nBPXPN-00021\n10.25 256.25\n25 \nBicalutamide (BPXPO-00538)\nBPXPN-00049\n2.15 53.75\n15 \nAmpicillin sodium\nBPXPN-00050\n16.99 254.85\n15 \nOctinoxate, Titanium Dioxide, Octisalate\nBPXPN-00004\n12.45 186.75\n25 \nCavia porcellus hair and cavia porcellus skin\nBPXPN-00020\n12.45 311.25\nSUBTOTAL 5964.50\nSALES TAX 596.45\nSHIPPING & HANDLING 50.00\nTOTAL DUE 6610.95\nMake all checks payable to Bioplex\nIf you have any questions concerning this invoice, contact Marianne de la Guillaume, +33 140 260294,\nmarianne.guillaume@bioplex.fr\nTHANK YOU FOR YOUR BUSINESS!",
+          "version": "5.3.31"
+        }
+      }
+    ],
+    "Information Extractor": [
+      {
+        "json": {
+          "output": {
+            "Invoice No": "BPXINV-00550",
+            "Client Name": "Roger Bigot",
+            "Client Email": "Not Available",
+            "Client Address": "4 Rue des Cites\nAubervilliers, Seine-Saint-Denis, 93300",
+            "Client Phone": "+33 148 340990",
+            "Total Amount": "6610.95",
+            "Invoice Date": "23.05.2021",
+            "Due Date": "None"
+          }
+        }
+      }
+    ],
+    "Update Invoice DB (Append)": [
+      {
+        "json": {
+          "Invoice No": "BPXINV-00550",
+          "Client Name": "Roger Bigot",
+          "Client Email": "Not Available",
+          "Client Address": "4 Rue des Cites\nAubervilliers, Seine-Saint-Denis, 93300",
+          "Client Phone": "+33 148 340990",
+          "Total Amount": "6610.95",
+          "Invoice Date": "23.05.2021",
+          "Due Date": "None"
+        }
+      }
+    ],
+    "Create Email": [
+      {
+        "json": {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": {
+              "Subject": "New Invoice Received: BPXINV-00550",
+              "Email": "Dear Billing Team,\n\nWe have received a new invoice from Roger Bigot. The details are as follows:\n\n- **Invoice Number:** BPXINV-00550\n- **Client Name:** Roger Bigot\n- **Client Email:** Not Available\n- **Total Amount:** $6610.95\n- **Invoice Date:** 23.05.2021\n- **Due Date:** None\n\nWe have also updated this in the Invoice Database, and you can view it here: https://docs.google.com/spreadsheets/d/1HPR7hr4LysBYJ1o_LSrD4i_6yepojkGZzMch-pIoxXo/edit?gid=0#gid=0\n\nBest regards,\nGreenland"
+            },
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      }
+    ],
+    "Send Email to Billing Team": [
+      {
+        "json": {
+          "id": "1993f105f356a416",
+          "threadId": "1993f105f356a416",
+          "labelIds": [
+            "SENT"
+          ]
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Update Invoice DB (Append)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Email": {
+      "main": [
+        [
+          {
+            "node": "Send Email to Billing Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger : When new Invoive pdf uploaded": {
+      "main": [
+        [
+          {
+            "node": "Download : Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download : Binary File": {
+      "main": [
+        [
+          {
+            "node": "Extract Text from Binary File : PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text from Binary File : PDF": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gemini-2.0-flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Invoice DB (Append)": {
+      "main": [
+        [
+          {
+            "node": "Create Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Billing Team": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "13b93756-e621-4872-a690-5a3d8bd220fb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91f42292365f2736b62ea45ddfd531a5d9a185f2bc4a363bfb1ae1188ac76851"
+  },
+  "id": "DblD2ra8ZneLWl6x",
+  "tags": []
+}
