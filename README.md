@@ -26,7 +26,7 @@ No manual data entry, no missed invoices — everything is automated end-to-end!
 ---
 
 ## 🖼️ Workflow Image  
-![Invoice Workflow](./workflow.png)  
+![Invoice Workflow](https://github.com/SachinSavkare/Purchase-Invoice-Workflow-Automating-PDF-Invoices-with-AI-n8n/blob/main/Invoice%20Workflow.JPG)  
 
 ---
 
